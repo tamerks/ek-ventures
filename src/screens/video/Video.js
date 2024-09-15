@@ -5,21 +5,21 @@ import {
   View,
   FlatList,
   Dimensions,
+  Platform,
 } from "react-native";
 import { Video } from "expo-av";
-import VideoButtons from "./components/VideoButtons";
 import axios from "axios";
-import { SafeAreaView } from "react-native-safe-area-context";
+import VideoButtons from "./components/VideoButtons";
 
 const { height: windowHeight } = Dimensions.get("window");
 
 const Media = ({ route }) => {
   const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [activeVideoIndex, setActiveVideoIndex] = useState(null);
   const videoRefs = useRef([]);
+  const flatListRef = useRef(null);
 
-  // Route parametrelerinden selectedVideo'yu al
   const { selectedVideo } = route.params || {};
 
   const getData = async () => {
@@ -29,7 +29,6 @@ const Media = ({ route }) => {
       );
       setData(response.data);
 
-      // selectedVideo varsa, activeVideoIndex'i ayarla
       if (selectedVideo) {
         const initialIndex = response.data.findIndex(
           (video) => video.id === selectedVideo.id
@@ -45,8 +44,19 @@ const Media = ({ route }) => {
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [selectedVideo]);
 
+  // Scroll the list when the active video changes
+  useEffect(() => {
+    if (data.length > 0 && activeVideoIndex !== null && flatListRef.current) {
+      flatListRef.current.scrollToIndex({
+        index: activeVideoIndex,
+        animated: false,
+      });
+    }
+  }, [data, activeVideoIndex]);
+
+  // Update the active video index when the visible item changes
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
     if (viewableItems.length > 0) {
       const index = viewableItems[0].index;
@@ -55,34 +65,73 @@ const Media = ({ route }) => {
   }, []);
 
   const viewabilityConfig = {
-    itemVisiblePercentThreshold: 80,
+    itemVisiblePercentThreshold: 80, // Activate when 80% of the video is visible
   };
 
-  const renderItem = ({ item, index }) => (
-    <View style={styles.videoContainer}>
-      <Video
-        ref={(ref) => (videoRefs.current[index] = ref)}
-        source={{ uri: item.urls.mp4 }}
-        resizeMode="cover"
-        style={styles.video}
-        shouldPlay={index === activeVideoIndex}
-        isLooping
-        onPlaybackStatusUpdate={(status) => {
-          if (status.isPlaying) {
-            setIsLoading(false);
-          } else {
-            setIsLoading(true);
-          }
-        }}
-      />
+  // Sıradaki videoyu önbelleğe al
+  const preloadNextVideo = useCallback(
+    (index) => {
+      if (index + 1 < data.length) {
+        const nextVideo = data[index + 1];
+        // const videoSource = nextVideo.urls.hls?.playlist || nextVideo.urls.mp4;
+        const videoSource = nextVideo.urls.mp4;
 
-      <VideoButtons data={item} />
-    </View>
+        videoRefs.current[index + 1]?.loadAsync(
+          { uri: videoSource },
+          {},
+          false
+        );
+      }
+    },
+    [data]
+  );
+
+  const renderItem = useCallback(
+    ({ item, index }) => {
+      const videoSource = item.urls.mp4;
+
+      return (
+        <View style={styles.videoContainer}>
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#FFFFFF" />
+            </View>
+          )}
+          <Video
+            ref={(ref) => (videoRefs.current[index] = ref)}
+            source={{
+              uri: videoSource,
+              shouldCache: true,
+            }}
+            resizeMode="contain"
+            style={styles.video}
+            shouldPlay={index === activeVideoIndex} //  Only the active video is played
+            isLooping
+            onLoad={() => {
+              preloadNextVideo(index);
+            }}
+            onPlaybackStatusUpdate={(status) => {
+              // Show loading when the video is paused
+              if (status.isPlaying) {
+                setLoading(false);
+              } else {
+                setLoading(true);
+              }
+            }}
+            onError={(error) => console.log(error)}
+          />
+
+          <VideoButtons data={item} />
+        </View>
+      );
+    },
+    [activeVideoIndex, loading, preloadNextVideo]
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <FlatList
+        ref={flatListRef}
         data={data}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
@@ -90,12 +139,19 @@ const Media = ({ route }) => {
         showsVerticalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
-        initialScrollIndex={activeVideoIndex} // İlk gösterilecek video
-        getItemLayout={(data, index) => (
-          { length: windowHeight, offset: windowHeight * index, index }
-        )}
+        getItemLayout={(data, index) => ({
+          length: windowHeight,
+          offset: windowHeight * index,
+          index,
+        })}
+        snapToInterval={windowHeight} // EShow only one video that covers the screen
+        snapToAlignment="start"
+        removeClippedSubviews={true} // Unmount off-screen videos
+        maxToRenderPerBatch={1} //  Only one video is rendered at a time
+        windowSize={2} //  Only the next video is preloaded
+        decelerationRate={Platform.OS === "ios" ? "fast" : "normal"}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -117,14 +173,10 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   loadingContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Yarı saydam arka plan
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     zIndex: 1,
   },
 });

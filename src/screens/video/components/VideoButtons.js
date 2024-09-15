@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity,Dimensions } from "react-native";
 import React, { useState } from "react";
 import { AntDesign, Entypo } from "@expo/vector-icons";
+
+const { width, height } = Dimensions.get("window");
 
 const VideoButtons = ({ data }) => {
   const [isLiked, setIsLiked] = useState(false);
@@ -51,10 +53,9 @@ export default VideoButtons;
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 85,
-    right: 10,
     alignItems: "center",
-    zIndex: 2,
+    right: 10,
+    top: height / 1.5,
   },
   text: {
     color: "white",

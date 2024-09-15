@@ -81,7 +81,7 @@ export const BottomMenuItem = ({
             ? "#ffffff"
             : "#0A0A0A",
           fontWeight: "400",
-          marginTop: 1,
+          marginTop: 3,
         }}
       >
         {screenName}
