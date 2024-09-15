@@ -32,5 +32,5 @@ After running npx expo start, a QR code will appear in your terminal. Scan this 
 
 The app will open on your mobile phone via the Expo Go app.
 
-Reminder
+## Reminder
 Ensure that your phone and computer are connected to the same Wi-Fi network for the Expo Go app to communicate with the project running on your local machine.
