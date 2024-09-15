@@ -1,3 +1,4 @@
+
 # EK Ventures
 
 This is the official repository for the EK Ventures project. Follow the steps below to set up and run the project on your local machine and mobile device.
@@ -8,29 +9,36 @@ This is the official repository for the EK Ventures project. Follow the steps be
 
    ```bash
    git clone https://github.com/tamerks/ek-ventures.git
-2. Install the dependencies:
+   ```
 
-Navigate to the project directory and install the required node_modules:
+2. **Install the dependencies:**
 
-npm install
+   Navigate to the project directory and install the required `node_modules`:
 
-3. Start the project:
+   ```bash
+   npm install
+   ```
 
-Use the following command to start the project:
+3. **Start the project:**
 
-npx expo start
+   Use the following command to start the project:
 
-4. Install Expo Go:
+   ```bash
+   npx expo start
+   ```
 
-Install the Expo Go app on your mobile phone from the App Store or Google Play Store.
+4. **Install Expo Go:**
 
-5. Scan the QR code:
+   Install the Expo Go app on your mobile phone from the [App Store](https://apps.apple.com/us/app/expo-go/id982107779) or [Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent&hl=en).
 
-After running npx expo start, a QR code will appear in your terminal. Scan this QR code using the Expo Go app on your phone.
+5. **Scan the QR code:**
 
-6. Run the app:
+   After running `npx expo start`, a QR code will appear in your terminal. Scan this QR code using the Expo Go app on your phone.
 
-The app will open on your mobile phone via the Expo Go app.
+6. **Run the app:**
+
+   The app will open on your mobile phone via the Expo Go app.
 
 ## Reminder
+
 Ensure that your phone and computer are connected to the same Wi-Fi network for the Expo Go app to communicate with the project running on your local machine.
