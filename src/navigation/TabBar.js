@@ -13,7 +13,7 @@ export const TabBar = ({ state, descriptors, navigation }) => {
   const [translateValue] = useState(new Animated.Value(0));
   const totalWidth = Dimensions.get("window").width;
   const tabWidth = totalWidth / state.routes.length;
-  console.log("state ", state.index);
+
   const animateSlider = (index) => {
     Animated.spring(translateValue, {
       toValue: index * tabWidth,
@@ -95,10 +95,10 @@ export const TabBar = ({ state, descriptors, navigation }) => {
               style={{ flex: 1 }}
               key={index}
             >
-              {console.log("icon ", options)}
               <BottomMenuItem
                 screenName={label.toString()}
                 isCurrent={isFocused}
+                selectedScreenIndex={state.index}
               />
             </TouchableOpacity>
           );

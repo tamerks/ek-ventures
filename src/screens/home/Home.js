@@ -12,13 +12,15 @@ import { DefaultColors } from "../../constans/DefaultColors";
 import { sizes } from "../../constans/sizes";
 import { FontAwesome, EvilIcons } from "@expo/vector-icons";
 import MediaCard from "./components/MediaCard";
+import { useSelector } from "react-redux";
 
 const Home = () => {
+  const user = useSelector((state) => state.userReducer);
+
   return (
     <View style={styles.container}>
-        <HomeHeader />
+      <HomeHeader />
       <ScrollView>
-
         <View style={{ paddingHorizontal: sizes.paddingHorizontal }}>
           <Text
             style={{
@@ -29,7 +31,7 @@ const Home = () => {
               marginTop: 15,
             }}
           >
-            Hello John,
+            Hello {user.name},
           </Text>
           <Text
             style={{

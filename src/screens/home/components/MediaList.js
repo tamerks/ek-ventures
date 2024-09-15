@@ -32,7 +32,7 @@ const MediaList = () => {
         ref={(ref) => {
           videoRefs.current[index] = ref;
         }}
-        source={{ uri: item.urls.hls.playlist }} // MP4 dosyasını buraya yükledik
+        source={{ uri: item.urls.mp4 }} // MP4 dosyasını buraya yükledik
         isMuted={false}
         resizeMode={ResizeMode.CONTAIN}
         // shouldPlay={false} // Otomatik oynatmayı kapattık
@@ -51,6 +51,7 @@ const MediaList = () => {
         data={data}
         keyExtractor={(item) => item.id}
         horizontal
+        showsHorizontalScrollIndicator={false}
         renderItem={renderItem}
       />
     </View>

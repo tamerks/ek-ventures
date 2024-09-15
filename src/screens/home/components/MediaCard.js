@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { DefaultColors } from "../../../constans/DefaultColors";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { FontAwesome5 } from "@expo/vector-icons";
 import MediaList from "./MediaList";
 
 const MediaCard = () => {

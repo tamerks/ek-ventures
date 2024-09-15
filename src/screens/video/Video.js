@@ -1,19 +1,26 @@
-import React, { useState, useRef, useEffect } from "react";
-import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
-import { Video, Audio } from "expo-av";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  View,
+  FlatList,
+  Dimensions,
+} from "react-native";
+import { Video } from "expo-av";
 import VideoButtons from "./components/VideoButtons";
-import { sizes } from "../../constans/sizes";
-import axios from "axios"; // Import axios for data fetching
+import axios from "axios";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const { height: windowHeight } = Dimensions.get("window");
 
 const Media = ({ route }) => {
-  if (route.params?.selectedVideo) {
-    var { selectedVideo } = route.params;
-  }
   const [data, setData] = useState([]);
-  const [videoUri, setVideoUri] = useState(null);
-  const videoRef = useRef(null);
-  const soundRef = useRef(new Audio.Sound()); // Reference for audio control
-  const [isLoading, setIsLoading] = useState(true); // Track loading state
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeVideoIndex, setActiveVideoIndex] = useState(null);
+  const videoRefs = useRef([]);
+
+  // Route parametrelerinden selectedVideo'yu al
+  const { selectedVideo } = route.params || {};
 
   const getData = async () => {
     try {
@@ -21,109 +28,89 @@ const Media = ({ route }) => {
         "https://66acf2fdf009b9d5c733eeea.mockapi.io/api/v1/videos"
       );
       setData(response.data);
-      // Set videoUri to the first item's URL if data is available
-      if (response.data.length > 0) {
-        setVideoUri(response.data[0].urls.mp4);
+
+      // selectedVideo varsa, activeVideoIndex'i ayarla
+      if (selectedVideo) {
+        const initialIndex = response.data.findIndex(
+          (video) => video.id === selectedVideo.id
+        );
+        setActiveVideoIndex(initialIndex >= 0 ? initialIndex : 0);
+      } else {
+        setActiveVideoIndex(0);
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const loadAndPlayAudio = async () => {
-    try {
-      if (selectedVideo?.urls?.hls?.files?.[0]) {
-        await soundRef.current.loadAsync(
-          { uri: selectedVideo.urls.hls.files[0] }, // HLS audio source
-          { shouldPlay: true, isLooping: true } // Auto-start and loop
-        );
-      }
-    } catch (error) {
-      console.log("Audio loading failed: ", error);
-    }
-  };
-
-  const stopAudio = async () => {
-    try {
-      await soundRef.current.stopAsync();
-    } catch (error) {
-      console.log("Failed to stop audio: ", error);
-    }
-  };
-
   useEffect(() => {
-    if (!selectedVideo) {
-      getData(); // Fetch data if selectedVideo is undefined
-    } else {
-      setVideoUri(selectedVideo.urls.mp4);
+    getData();
+  }, []);
+
+  const onViewableItemsChanged = useCallback(({ viewableItems }) => {
+    if (viewableItems.length > 0) {
+      const index = viewableItems[0].index;
+      setActiveVideoIndex(index);
     }
-  }, [selectedVideo]);
+  }, []);
+
+  const viewabilityConfig = {
+    itemVisiblePercentThreshold: 80,
+  };
+
+  const renderItem = ({ item, index }) => (
+    <View style={styles.videoContainer}>
+      <Video
+        ref={(ref) => (videoRefs.current[index] = ref)}
+        source={{ uri: item.urls.mp4 }}
+        resizeMode="cover"
+        style={styles.video}
+        shouldPlay={index === activeVideoIndex}
+        isLooping
+        onPlaybackStatusUpdate={(status) => {
+          if (status.isPlaying) {
+            setIsLoading(false);
+          } else {
+            setIsLoading(true);
+          }
+        }}
+      />
+
+      <VideoButtons data={item} />
+    </View>
+  );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Media</Text>
-        <Image
-          source={require("../../assets/icons/camera-outline.png")}
-          style={styles.headerIcon}
-        />
-      </View>
-
-      {isLoading && ( // Show loading spinner if the video is buffering or not playing
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FFFFFF" />
-        </View>
-      )}
-
-      {videoUri && (
-        <Video
-          ref={videoRef}
-          source={{ uri: videoUri }} // Video source
-          resizeMode="stretch"
-          style={styles.video}
-          shouldPlay // Auto-start video playback
-          isLooping // Video loops continuously
-          onPlaybackStatusUpdate={(status) => {
-            if (status.isPlaying) {
-              setIsLoading(false); // Remove loading indicator when video starts
-            } else {
-              setIsLoading(true); // Show loading when video is paused
-            }
-          }}
-        />
-      )}
-
-      <VideoButtons data={selectedVideo || data[0]} />
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        pagingEnabled
+        showsVerticalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        initialScrollIndex={activeVideoIndex} // İlk gösterilecek video
+        getItemLayout={(data, index) => (
+          { length: windowHeight, offset: windowHeight * index, index }
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
 export default Media;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#000",
   },
-  headerContainer: {
-    position: "absolute",
-    flexDirection: "row",
-    justifyContent: "space-between",
+  videoContainer: {
+    height: windowHeight,
+    justifyContent: "center",
     alignItems: "center",
-    zIndex: 2,
-    top: 50,
-    width: "100%",
-    paddingHorizontal: sizes.paddingHorizontal,
-  },
-  headerText: {
-    color: "#FFFFFF",
-    fontSize: 23,
-    fontWeight: "600",
-  },
-  headerIcon: {
-    width: 27,
-    height: 16,
-    resizeMode: "contain",
+    position: "relative",
   },
   video: {
     width: "100%",
@@ -137,7 +124,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background for loader
-    zIndex: 3, // Ensure loader appears above video
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Yarı saydam arka plan
+    zIndex: 1,
   },
 });
