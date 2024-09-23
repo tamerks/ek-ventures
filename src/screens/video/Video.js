@@ -68,7 +68,7 @@ const Media = ({ route }) => {
     itemVisiblePercentThreshold: 80, // Activate when 80% of the video is visible
   };
 
-  // Sıradaki videoyu önbelleğe al
+  // Preload the next video
   const preloadNextVideo = useCallback(
     (index) => {
       if (index + 1 < data.length) {
