@@ -7,8 +7,8 @@ To use your own video data, you can make the necessary adjustments in the getDat
 Follow the steps below to set up and run the project on your local machine and mobile device.
 
 <p align="center">
-  <img src="https://i.imgur.com/EDLn79J.jpeg" width="45%" alt="Screenshot 1">
-  <img src="https://i.imgur.com/P5nrG5i.jpeg" width="45%" alt="Screenshot 2">
+  <img src="https://i.imgur.com/EDLn79J.jpeg" width="35%" alt="Screenshot 1">
+  <img src="https://i.imgur.com/P5nrG5i.jpeg" width="35%" alt="Screenshot 2">
 </p>
 
 
