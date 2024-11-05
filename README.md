@@ -6,8 +6,10 @@ A case application for EK Ventures. It includes a Video screen with an Instagram
 To use your own video data, you can make the necessary adjustments in the getData function within Video.js to fetch your custom video data.
 Follow the steps below to set up and run the project on your local machine and mobile device.
 
-![Screenshot 1](https://i.imgur.com/EDLn79J.jpeg)
-![Screenshot 2](https://i.imgur.com/P5nrG5i.jpeg)
+<p align="center">
+  <img src="https://i.imgur.com/EDLn79J.jpeg" width="45%" alt="Screenshot 1">
+  <img src="https://i.imgur.com/P5nrG5i.jpeg" width="45%" alt="Screenshot 2">
+</p>
 
 ## Setup
 
