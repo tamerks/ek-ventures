@@ -1,7 +1,7 @@
 
 # Instagram/TikTok Video Feed
 
-A case application for a company. It includes a Video screen with an Instagram/TikTok-style reels feed, allowing smooth and seamless transitions between videos.
+React Native case application for a project. It includes a Video screen with an Instagram/TikTok-style reels feed, allowing smooth and seamless transitions between videos.
 
 To use your own video data, you can make the necessary adjustments in the getData function within Video.js to fetch your custom video data.
 Follow the steps below to set up and run the project on your local machine and mobile device.
