@@ -11,7 +11,10 @@ Follow the steps below to set up and run the project on your local machine and m
   <img src="https://i.imgur.com/P5nrG5i.jpeg" width="45%" alt="Screenshot 2">
 </p>
 
-[![Demo Video](https://i.imgur.com/P5nrG5i.jpeg)](https://drive.google.com/file/d/1FIBrKhcncaKx9ilswJuv6wghKGrU8_mp/view)  
+
+
+https://github.com/user-attachments/assets/87210488-f61c-4e1a-8719-ed038cbb3d8f
+
 
 ## Setup
 
