@@ -3,10 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   id: 123456,
-  name: "Eugene",
-  surname: "Kouumdjieff",
-  company: "EK Ventures",
-  avatar: "https://ek.ventures/img/team/eugene-kouumdjieff.png",
+  name: "Tamer",
+  surname: "Köşe",
+  company: "Tamer Kose Software",
+  avatar: "https://avatars.githubusercontent.com/u/49494446?v=4",
 };
 
 const userSlice = createSlice({
